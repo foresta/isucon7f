@@ -646,7 +646,7 @@ func redis_set(key string, value int64) {
     conn.Do("SET", key, strconv.FormatInt(value, 10))
 }
 
-func redis_get(key string) int64{
+func redis_get(key string) int64 {
     conn := redis_connection()
     if conn == nil {
         return 0
@@ -655,5 +655,6 @@ func redis_get(key string) int64{
     if err != nil {
         return 0
     }
-    return strconv.ParseInt(s, 10, 64)
+    value, err := strconv.ParseInt(s, 10, 64)
+    return value
 }
