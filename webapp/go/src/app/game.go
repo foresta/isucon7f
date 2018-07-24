@@ -653,8 +653,7 @@ func redis_get(key string) int64{
     }
     s, err := redis.String(conn.Do("GET", key))
     if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
+        return 0
     }
     return strconv.ParseInt(s, 10, 64)
 }
