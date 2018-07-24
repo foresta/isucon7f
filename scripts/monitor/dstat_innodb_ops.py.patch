@@ -1,0 +1,22 @@
+--- dstat_innodb_ops.py	2018-07-24 21:46:35.000000000 +0900
++++ dstat_innodb_ops_patched.py	2018-07-24 21:47:51.000000000 +0900
+@@ -24,14 +24,14 @@
+     def extract(self):
+         try:
+             self.stdin.write('show engine innodb status\G\n')
+-            line = greppipe(self.stdout, 'OS file reads ')
++            line = greppipe(self.stdout, 'Number of rows ')
+
+             if line:
+                 l = line.split()
+-                self.set2['inserted'] = l[4].rstrip(',')
+-                self.set2['updated'] = l[6].rstrip(',')
+-                self.set2['deleted'] = l[8].rstrip(',')
+-                self.set2['read'] = l[10]
++                self.set2['inserted'] = int(l[4].rstrip(','))
++                self.set2['updated'] = int(l[6].rstrip(','))
++                self.set2['deleted'] = int(l[8].rstrip(','))
++                self.set2['read'] = int(l[10])
+
+             for name in self.vars:
+                 self.val[name] = (self.set2[name] - self.set1[name]) * 1.0 / elapsed
