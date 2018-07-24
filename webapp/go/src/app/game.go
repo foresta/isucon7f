@@ -11,7 +11,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
+    "github.com/gomodule/redigo/redis"
 )
+
+// ServiceImpl is service implement
+redisConn redis.Conn
 
 type GameRequest struct {
 	RequestID int    `json:"request_id"`
@@ -162,21 +166,8 @@ func getCurrentTime() (int64, error) {
 // そのトランザクション中の通常のSELECTクエリが返す結果がロック取得前の
 // 状態になることに注意 (keyword: MVCC, repeatable read).
 func updateRoomTime(tx *sqlx.Tx, roomName string, reqTime int64) (int64, bool) {
-	// See page 13 and 17 in https://www.slideshare.net/ichirin2501/insert-51938787
-	_, err := tx.Exec("INSERT INTO room_time(room_name, time) VALUES (?, 0) ON DUPLICATE KEY UPDATE time = time", roomName)
-	if err != nil {
-		log.Println(err)
-		return 0, false
-	}
-
-	var roomTime int64
-	err = tx.Get(&roomTime, "SELECT time FROM room_time WHERE room_name = ? FOR UPDATE", roomName)
-	if err != nil {
-		log.Println(err)
-		return 0, false
-	}
-
 	var currentTime int64
+    roomTime := redis_get(roomName)
 	err = tx.Get(&currentTime, "SELECT floor(unix_timestamp(current_timestamp(3))*1000)")
 	if err != nil {
 		log.Println(err)
@@ -193,11 +184,7 @@ func updateRoomTime(tx *sqlx.Tx, roomName string, reqTime int64) (int64, bool) {
 		}
 	}
 
-	_, err = tx.Exec("UPDATE room_time SET time = ? WHERE room_name = ?", currentTime, roomName)
-	if err != nil {
-		log.Println(err)
-		return 0, false
-	}
+    redis_set(roomName, currentTime)
 
 	return currentTime, true
 }
@@ -633,4 +620,41 @@ func serveGameConn(ws *websocket.Conn, roomName string) {
 			return
 		}
 	}
+}
+
+func redis_connection() redis.Conn {
+    if redisConn != nil {
+		return redisConn
+	}
+
+    const IP_PORT = "localhost:6379"
+
+    //redisに接続
+    redisConn, err := redis.Dial("tcp", IP_PORT)
+    if err != nil {
+        panic(err)
+    }
+    return redisConn
+}
+
+func redis_set(key string, value int64) {
+    conn := redis_connection()
+    if conn == nil {
+        return
+    }
+
+    conn.Do("SET", key, strconv.FormatInt(value, 10))
+}
+
+func redis_get(key string) int64{
+    conn := redis_connection()
+    if conn == nil {
+        return 0
+    }
+    s, err := redis.String(conn.Do("GET", key))
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    return strconv.ParseInt(s, 10, 64)
 }
