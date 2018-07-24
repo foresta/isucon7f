@@ -168,7 +168,7 @@ func getCurrentTime() (int64, error) {
 func updateRoomTime(tx *sqlx.Tx, roomName string, reqTime int64) (int64, bool) {
 	var currentTime int64
     roomTime := redis_get(roomName)
-	err = tx.Get(&currentTime, "SELECT floor(unix_timestamp(current_timestamp(3))*1000)")
+    err := tx.Get(&currentTime, "SELECT floor(unix_timestamp(current_timestamp(3))*1000)")
 	if err != nil {
 		log.Println(err)
 		return 0, false
