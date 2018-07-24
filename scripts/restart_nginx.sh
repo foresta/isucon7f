@@ -5,6 +5,6 @@ set -eu
 echo "restarting nginx ..."
 
 sudo nginx -t
-sudo service nginx restart
+sudo systemctl restart nginx
 
 echo "DONE: nginx restarted"
