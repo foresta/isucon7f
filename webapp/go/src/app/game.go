@@ -15,7 +15,7 @@ import (
 )
 
 // ServiceImpl is service implement
-redisConn redis.Conn
+var redisConn redis.Conn
 
 type GameRequest struct {
 	RequestID int    `json:"request_id"`
