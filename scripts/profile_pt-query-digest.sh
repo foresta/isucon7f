@@ -2,7 +2,7 @@
 
 set -eu
 
-source ./env.sh
+. ./env.sh
 
 sudo mkdir -p $TMP
 cd $TMP
@@ -14,4 +14,4 @@ if [ ! -e percona-toolkit ]; then
 fi
 
 cd percona-toolkit/bin
-sudo sh -c "./pt-query-digest --type slowlog /var/log/mysql/mysql-slow.log --explain h=localhost,u=root > pt-log.txt"
+sudo sh -c "./pt-query-digest --type slowlog /var/log/mysql/mysql-slow.log --explain h=localhost,u=root > $TMP/pt-log.txt"

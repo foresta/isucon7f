@@ -2,7 +2,9 @@
 
 set -eu
 
-source ./env.sh
+cd `dirname $0`
+
+. ./env.sh
 
 sudo mkdir -p $TMP
 cd $TMP
@@ -13,7 +15,7 @@ if [ ! -e kataribe ]; then
 fi
 
 cd $TMP/kataribe
-sudo sh -c "cat /var/log/nginx/access.log | ./kataribe -f kataribe.toml > kataribe_profile.txt"
+sudo sh -c "cat /var/log/nginx/access.log | ./kataribe -f kataribe.toml > $TMP/kataribe_profile.txt"
 
 
 

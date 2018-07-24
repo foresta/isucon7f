@@ -2,7 +2,9 @@
 
 set -ue
 
-source ./env.sh
+cd `dirname $0`
+
+. ./env.sh
 
 on() {
     sh ./profile/slow_query.sh on
@@ -10,7 +12,7 @@ on() {
 }
 
 off() {
-#    sh ./profile/slow_query.sh off
+    sh ./profile/slow_query.sh off
     sh ./profile/nginx_for_kataribe.sh off
 }
 

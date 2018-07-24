@@ -2,7 +2,7 @@
 
 set -eu
 
-source ./env.sh
+. ./env.sh
 
 echo $WEBAPP_DIR
 cd $WEBAPP_DIR
