@@ -14,6 +14,15 @@ patch_innodb_ops() {
     sudo patch -u /usr/share/dstat/dstat_innodb_ops.py < "${CURRENT_DIR}/dstat_innodb_ops.py.patch"
 }
 
+set_alias() {
+    echo "" >> ~/.bashrc
+    echo "alias dstat-full='dstat -Tclmdrn'" >> ~/.bashrc
+    echo "alias dstat-mem='dstat -Tclm'" >> ~/.bashrc
+    echo "alias dstat-cpu='dstat -Tclr'" >> ~/.bashrc
+    echo "alias dstat-net='dstat -Tclnd'" >> ~/.bashrc
+    echo "alias dstat-disk='dstat -Tcldr'" >> ~/.bashrc
+}
+
 if [ -n "$(which dstat)" ]; then
     echo "dstat already installed"
     exit
@@ -26,4 +35,6 @@ elif [ -n "$(which yum)" ]; then
 fi
 
 patch_innodb_ops
+
+set_alias
 
